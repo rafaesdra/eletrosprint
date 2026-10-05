@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Consulte o ranking geral de velocidade dos corredores.">
+  <meta name="theme-color" content="#071a2e">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ranking geral — Medidor de Velocidade">
+  <meta property="og:description" content="Confira as melhores marcas de velocidade dos corredores.">
+  <title>Ranking geral — Medidor de Velocidade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071a2e;--surface:#0b2b4d;--line:#28517a;--text:#fff;
+      --muted:#b4c8dc;--accent:#f2b705;--teal:#58b4e8;
+      color-scheme:dark;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:32px 20px 24px;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}
+    main{max-width:1000px;min-height:calc(100vh - 56px);margin:0 auto;display:flex;flex-direction:column}
+    header{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;text-align:center;border-top:4px solid var(--accent);border-bottom:1px solid var(--line);padding:18px 0 22px;margin-bottom:26px}
+    h1{font-family:Rajdhani,Inter,sans-serif;font-weight:700;font-size:42px;line-height:1.05;letter-spacing:.6px;margin:0}
+    h1 span{color:var(--accent)}
+    .sub,.status{color:var(--muted);font-size:14px;margin-top:5px}
+    a{color:var(--accent);text-underline-offset:3px}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    .sub{margin-top:5px}
+    .ranking-card{flex:1}
+    .institutional-logos{display:flex;align-items:center;justify-content:center;gap:18px;padding:8px 18px;border-radius:14px;background:rgba(255,255,255,.96);box-shadow:0 0 22px rgba(242,183,5,.14)}
+    .institutional-logo{width:68px;height:68px;display:grid;place-items:center}
+    .institutional-logo img{display:block;width:100%;height:100%;object-fit:contain}
+    .institutional-divider{width:1px;height:48px;background:#d5dfeb}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+    .table-scroll{overflow-x:auto;border-radius:8px}
+    table{width:100%;min-width:650px;border-collapse:collapse}
+    th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line)}
+    th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+    caption{padding:0 0 12px;text-align:left;color:var(--muted);font-size:13px}
+    .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .place{font-family:Rajdhani,Inter,sans-serif;font-size:24px;font-weight:700;color:var(--accent)}
+    .speed{font-family:Rajdhani,Inter,sans-serif;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+    .empty{color:var(--muted);padding:22px 10px;text-align:center}
+    .error{color:#ff8a7a}
+    .podium-1{background:linear-gradient(90deg,#f2b70520,transparent 75%)}
+    .podium-2{background:linear-gradient(90deg,#c5d4e020,transparent 75%)}
+    .podium-3{background:linear-gradient(90deg,#c8794520,transparent 75%)}
+    .podium-1 .place{color:#ffd84a}
+    .podium-2 .place{color:#d4e0ed}
+    .podium-3 .place{color:#e6a477}
+    @media(prefers-reduced-motion:no-preference){.institutional-logos{transition:box-shadow .2s ease}.institutional-logos:hover{box-shadow:0 0 28px rgba(242,183,5,.3)}}
+    @media(max-width:600px){
+      body{padding:20px 12px 16px}
+      main{min-height:calc(100vh - 36px)}
+      .card{padding:12px}
+      th,td{padding:10px 7px;font-size:12px}
+      h1{font-size:36px}
+      table{min-width:0}
+      th:nth-child(5),td:nth-child(5){display:none}
+      header{gap:12px;padding:16px 0 20px}
+      .institutional-logos{gap:14px;padding:7px 14px}
+      .institutional-logo{width:58px;height:58px}
+      .institutional-divider{height:42px}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="institutional-logos" aria-label="Universidade Federal de Campina Grande e Curso de Engenharia Elétrica">
+        <div class="institutional-logo">
+          <img src="assets/ufcg-selo.png" alt="Universidade Federal de Campina Grande" width="68" height="68">
+        </div>
+        <div class="institutional-divider" aria-hidden="true"></div>
+        <div class="institutional-logo">
+          <img src="assets/engenharia-eletrica.png" alt="Curso de Engenharia Elétrica da UFCG" width="68" height="68">
+        </div>
+      </div>
+      <div>
+        <h1>Ranking geral<span>.</span></h1>
+        <div class="sub">Medidor de velocidade · Melhor marca de cada corredor</div>
+      </div>
+    </header>
+    <section class="card ranking-card" aria-label="Ranking de corredores">
+      <div id="rankingStatus" class="status" role="status" aria-live="polite">Conectando ao ranking…</div>
+      <div class="table-scroll" role="region" aria-label="Tabela de melhores velocidades" tabindex="0">
+      <table>
+        <caption>Melhor velocidade registrada por participante. Empates compartilham a posição.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Posição</th>
+            <th scope="col">Corredor</th>
+            <th scope="col">Categoria · gênero</th>
+            <th scope="col">Melhor velocidade</th>
+            <th scope="col">Data</th>
+          </tr>
+        </thead>
+        <tbody id="rankingBody"></tbody>
+      </table>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    const status = document.getElementById('rankingStatus');
+    const body = document.getElementById('rankingBody');
+    const MAX_VALID_SPEED_KMH = 45;
+
+    function isValidResult(result){
+      return typeof result.runnerId === 'string' &&
+        typeof result.runnerName === 'string' &&
+        typeof result.velocityKmh === 'number' &&
+        Number.isFinite(result.velocityKmh) &&
+        result.velocityKmh > 0 &&
+        result.velocityKmh <= MAX_VALID_SPEED_KMH;
+    }
+
+    function buildRanking(results){
+      const bestByRunner = new Map();
+      results.forEach(result => {
+        if (!isValidResult(result)) return;
+        const previous = bestByRunner.get(result.runnerId);
+        if (!previous || result.velocityKmh > previous.velocityKmh){
+          bestByRunner.set(result.runnerId, result);
+        }
+      });
+
+      const sorted = [...bestByRunner.values()].sort((a, b) =>
+        b.velocityKmh - a.velocityKmh ||
+        a.runnerName.localeCompare(b.runnerName, 'pt-BR')
+      );
+      let place = 0;
+      let previousDisplayedSpeed = null;
+      return sorted.map((result, index) => {
+        const displayedSpeed = Number(result.velocityKmh.toFixed(2));
+        if (displayedSpeed !== previousDisplayedSpeed) place = index + 1;
+        previousDisplayedSpeed = displayedSpeed;
+        return {result, place};
+      });
+    }
+
+    function showError(message){
+      status.textContent = message;
+      status.classList.add('error');
+    }
+
+    function renderRanking(snapshot){
+      const results = snapshot.docs.map(resultDoc => resultDoc.data());
+      const invalidCount = results.filter(result => !isValidResult(result)).length;
+      const ranking = buildRanking(results);
+      body.replaceChildren();
+
+      if (!ranking.length){
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.className = 'empty';
+        cell.textContent = 'Ainda não há resultados publicados.';
+        row.appendChild(cell);
+        body.appendChild(row);
+      } else {
+        ranking.forEach(({result, place:placeNumber}) => {
+          const row = document.createElement('tr');
+          if (placeNumber <= 3) row.classList.add(`podium-${placeNumber}`);
+          const place = document.createElement('td');
+          place.className = 'place';
+          place.textContent = `${placeNumber}º`;
+          const name = document.createElement('td');
+          name.textContent = result.runnerName;
+          const category = document.createElement('td');
+          const genderLabel = result.gender === 'M' ? 'Masculino' :
+            result.gender === 'F' ? 'Feminino' : '';
+          category.textContent = result.category
+            ? `${result.category}${genderLabel ? ` · ${genderLabel}` : ''}`
+            : '—';
+          const speed = document.createElement('td');
+          speed.className = 'speed';
+          speed.textContent = `${result.velocityKmh.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})} km/h`;
+          const date = document.createElement('td');
+          date.textContent = result.recordedAt && typeof result.recordedAt.toDate === 'function'
+            ? result.recordedAt.toDate().toLocaleDateString('pt-BR', {timeZone:'America/Fortaleza'})
+            : '—';
+          row.append(place, name, category, speed, date);
+          body.appendChild(row);
+        });
+      }
+
+      if (snapshot.metadata.fromCache){
+        status.textContent = ranking.length
+          ? `Sem conexão · exibindo dados salvos · ${ranking.length} corredor(es)`
+          : 'Sem conexão com o ranking. Verifique sua internet e tente novamente.';
+      } else {
+        status.textContent = `Atualização ao vivo · ${ranking.length} corredor(es)` +
+          (invalidCount ? ` · ${invalidCount} resultado(s) inválido(s) ignorado(s)` : '');
+      }
+      status.classList.remove('error');
+    }
+
+    function firebaseErrorMessage(error){
+      const code = error && error.code;
+      if (code === 'permission-denied') return 'O Firebase recusou o acesso ao ranking. Verifique as regras do Firestore.';
+      if (code === 'unavailable' || code === 'network-request-failed') return 'Ranking temporariamente indisponível. Verifique sua conexão.';
+      if (code === 'failed-precondition') return 'O ranking precisa de uma configuração adicional no Firestore.';
+      return 'Não foi possível carregar o ranking. Tente novamente mais tarde.';
+    }
+
+    try {
+      const [
+        {firebaseConfig},
+        {initializeApp},
+        {collection, getFirestore, onSnapshot}
+      ] = await Promise.all([
+        import('./firebase-config.js'),
+        import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),
+        import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')
+      ]);
+
+      const configReady = firebaseConfig && firebaseConfig.apiKey &&
+        firebaseConfig.apiKey !== 'COLE_SUA_API_KEY' &&
+        firebaseConfig.projectId &&
+        firebaseConfig.projectId !== 'COLE_SEU_PROJECT_ID';
+      if (!configReady){
+        showError('O ranking ainda não foi configurado pelo responsável.');
+      } else {
+        const app = initializeApp(firebaseConfig);
+        onSnapshot(
+          collection(getFirestore(app), 'results'),
+          {includeMetadataChanges:true},
+          renderRanking,
+          error => showError(firebaseErrorMessage(error))
+        );
+      }
+    } catch (error){
+      showError('Falha ao iniciar o ranking. Recarregue a página e tente novamente.');
+    }
+  </script>
+</body>
+</html>
